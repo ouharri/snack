@@ -5,84 +5,86 @@ class Snack {
     this.posX = 0;
     this.posY = 0;
     this.score = 0;
+    this.snackElement = document.getElementById("snack");
     this.scoreElement = document.getElementById("score");
     this.headElement = document.getElementById("head");
+    this.tailElement = document.querySelector(".tail");
+    this.tailPositions = [];
     this.bait = {
-      element : document.getElementById("bait"),
-      posX : parseInt(this.randomIntFromInterval(0,19)) * 30,
-      posY : parseInt(this.randomIntFromInterval(0,19)) * 30
-    }
+      element: document.getElementById("bait"),
+      posX: this.getRandomPosition(),
+      posY: this.getRandomPosition()
+    };
+    this.intervalId = null;
   }
 
-  randomIntFromInterval(min, max) { // min and max included 
-    return Math.floor(Math.random() * (max - min + 1) + min)
+  getRandomPosition() {
+    return Math.floor(Math.random() * 20) * 30;
   }
+
   move() {
     switch (this.direction) {
       case 'RIGHT':
-        if (this.posX > 600) this.posX = 0;
-        this.posX += 30;
-        this.headElement.style.left = this.posX + "px";
-
-        if(this.bait.posX == this.posX && this.bait.posY == this.posY) {
-          this.score++;
-          this.setBait();
-          console.log(this.score);
-        }
-
-
+        this.posX = (this.posX + 30) % 600;
         break;
       case 'LEFT':
-        if (this.posX <= 0) this.posX = 600;
-        this.posX -= 30;
-        this.headElement.style.left = this.posX + "px";
-        if(this.bait.posX == this.posX && this.bait.posY == this.posY) {
-          this.score++;
-          this.setBait();
-          console.log(this.score);
-        }
+        this.posX = (this.posX - 30 + 600) % 600;
         break;
       case 'TOP':
-        if (this.posY <= 0) this.posY = 600;
-        this.posY -= 30;
-        this.headElement.style.top = this.posY + "px";
-        if(this.bait.posX == this.posX && this.bait.posY == this.posY) {
-          this.score++;
-          this.setBait();
-          console.log(this.score);
-        }
+        this.posY = (this.posY - 30 + 600) % 600;
         break;
       case 'BOTTOM':
-        if (this.posY > 600) this.posY = 0;
-        this.posY += 30;
-        this.headElement.style.top = this.posY + "px";
-        if(this.bait.posX == this.posX && this.bait.posY == this.posY) {
-          this.score++;
-          this.setBait();
-          console.log(this.score);
-        }
+        this.posY = (this.posY + 30) % 600;
         break;
+    }
+
+    this.headElement.style.left = this.posX + "px";
+    this.headElement.style.top = this.posY + "px";
+
+    if (this.isCollisionWithBait()) {
+      this.score += 10;
+      this.setBait();
+      this.setTail();
+      this.scoreElement.innerHTML = this.score;
     }
   }
 
-  setBait() {
-    this.bait.posX = parseInt(Math.random() * 20) * 30;
-    this.bait.posY = parseInt(Math.random() * 20) * 30;
+  isCollisionWithBait() {
+    return this.bait.posX === this.posX && this.bait.posY === this.posY;
+  }
 
+  setBait() {
+    this.bait.posX = this.getRandomPosition();
+    this.bait.posY = this.getRandomPosition();
     this.bait.element.style.left = this.bait.posX + "px";
     this.bait.element.style.top = this.bait.posY + "px";
+  }
 
-    this.scoreElement.innerHTML = this.score;
+  setTail() {
+    // const newTail = document.createElement("div");
+    // newTail.className = "tail";
+    // newTail.style.left = this.posX + "px";
+    // newTail.style.top = this.posY + "px";
+    // this.snackElement.appendChild(newTail);
+    // this.tailPositions.push({ left: this.posX, top: this.posY });
+
+    // if (this.tailPositions.length > this.score) {
+    //   const removedTail = this.tailPositions.shift();
+    //   const removedTailElement = this.tailElement.nextElementSibling;
+    //   this.snackElement.removeChild(removedTailElement);
+    // }
+
+    // let tail = document.querySelectorAll(".tail");
+
+    // Array.from(tail).forEach((item, index) => {
+    //   item.style.left = (this.posX + 30 * index) + "px";
+    //   item.style.top = (this.posY + 30 * index) + "px";
+    // });
   }
 
   start() {
-
-    this.bait.element.style.left = this.bait.posX + "px";
-    this.bait.element.style.top = this.bait.posY + "px";
-
-    this.intervalId = setInterval(() => {
-      this.move();
-    }, this.speed);
+    this.setBait();
+    this.intervalId = setInterval(() => this.move(), this.speed);
   }
 
   stop() {
@@ -93,23 +95,22 @@ class Snack {
 const snack = new Snack();
 snack.start();
 
-
 window.addEventListener("keydown", function (event) {
   if (event.defaultPrevented) {
     return;
   }
   switch (event.key) {
     case "ArrowDown":
-      if(snack.direction != 'TOP') snack.direction = 'BOTTOM';
+      if (snack.direction !== 'TOP') snack.direction = 'BOTTOM';
       break;
     case "ArrowUp":
-      if(snack.direction != 'BOTTOM') snack.direction = 'TOP';
+      if (snack.direction !== 'BOTTOM') snack.direction = 'TOP';
       break;
     case "ArrowLeft":
-      if(snack.direction != 'RIGHT') snack.direction = 'LEFT';
+      if (snack.direction !== 'RIGHT') snack.direction = 'LEFT';
       break;
     case "ArrowRight":
-      if(snack.direction != 'LEFT') snack.direction = 'RIGHT';
+      if (snack.direction !== 'LEFT') snack.direction = 'RIGHT';
       break;
     default:
       return;
