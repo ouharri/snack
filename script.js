@@ -153,7 +153,7 @@ class Snake {
   }
 }
 
-const snack = new Snake();
+const snake = new Snake();
 
 // Event listener for arrow key presses to change direction
 window.addEventListener("keydown", function (event) {
@@ -163,16 +163,16 @@ window.addEventListener("keydown", function (event) {
 
   switch (event.key) {
     case "ArrowDown":
-      if (snack.direction !== 'up') snack.setDirection("down");
+      if (snake.direction !== 'up') snake.setDirection("down");
       break;
     case "ArrowUp":
-      if (snack.direction !== 'down') snack.setDirection("up");
+      if (snake.direction !== 'down') snake.setDirection("up");
       break;
     case "ArrowLeft":
-      if (snack.direction !== 'right') snack.setDirection("left");
+      if (snake.direction !== 'right') snake.setDirection("left");
       break;
     case "ArrowRight":
-      if (snack.direction !== 'left') snack.setDirection("right");
+      if (snake.direction !== 'left') snake.setDirection("right");
       break;
     default:
       return;
