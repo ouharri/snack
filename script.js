@@ -1,118 +1,154 @@
-class Snack {
+// Constants for grid size and cell size
+const GRID_SIZE = 20;
+const CELL_SIZE = 30;
+
+// Create the grid
+const contentElement = document.getElementById("content");
+const grid = [];
+
+for (let i = 0; i < GRID_SIZE; i++) {
+  const line = document.createElement("div");
+  line.classList.add("line");
+  const row = [];
+
+  for (let j = 0; j < GRID_SIZE; j++) {
+    const square = document.createElement("div");
+    square.id = j + "-" + i;
+    square.classList.add("square");
+    square.style.left = j * CELL_SIZE + "px";
+    square.style.top = i * CELL_SIZE + "px";
+    line.appendChild(square);
+    row.push(square);
+  }
+
+  contentElement.appendChild(line);
+  grid.push(row);
+}
+
+// Function to turn square to light color
+function activateSquare(i, j) {
+  grid[j][i].style.background = "#fff";
+}
+
+// Function to reset square color
+function shutdownSquare(i, j) {
+  try {
+    grid[j][i].style.background = "#05204A";
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+class Snake {
   constructor() {
-    this.direction = 'RIGHT';
-    this.speed = 100;
-    this.posX = 0;
-    this.posY = 0;
-    this.score = 0;
-    this.snackElement = document.getElementById("snack");
+    this.direction = "right";
+    this.speed = 5;
+    this.size = 2;
+    this.x = 4;
+    this.y = 9;
+    this.prevX = this.x;
+    this.prevY = this.y;
     this.scoreElement = document.getElementById("score");
-    this.headElement = document.getElementById("head");
-    this.tailElement = document.querySelector(".tail");
-    this.tailPositions = [];
     this.bait = {
       element: document.getElementById("bait"),
       posX: this.getRandomPosition(),
-      posY: this.getRandomPosition()
+      posY: this.getRandomPosition(),
     };
-    this.intervalId = null;
+    this.score = 0;
+
+    // Initialize the bait position
+    let square = document.getElementById(this.bait.posX + "-" + this.bait.posY);
+    square.style.background = "#8734f2";
+
+    // Start the game loop
+    this.move();
   }
 
-  getRandomPosition() {
-    return Math.floor(Math.random() * 20) * 30;
+  setDirection(direction) {
+    this.direction = direction;
   }
 
-  move() {
-    switch (this.direction) {
-      case 'RIGHT':
-        this.posX = (this.posX + 30) % 600;
-        break;
-      case 'LEFT':
-        this.posX = (this.posX - 30 + 600) % 600;
-        break;
-      case 'TOP':
-        this.posY = (this.posY - 30 + 600) % 600;
-        break;
-      case 'BOTTOM':
-        this.posY = (this.posY + 30) % 600;
-        break;
-    }
+  move(x = this.x, y = this.y) {
+    setTimeout(() => {
+      activateSquare(x, y);
 
-    this.headElement.style.left = this.posX + "px";
-    this.headElement.style.top = this.posY + "px";
+      // Turn off the previous square
+      let prevX = this.x;
+      let prevY = this.y;
 
-    if (this.isCollisionWithBait()) {
-      this.score += 10;
-      this.setBait();
-      this.setTail();
-      this.scoreElement.innerHTML = this.score;
-    }
-  }
+      setTimeout(() => {
+        shutdownSquare(prevX, prevY);
+      }, (this.size - 1) * (400 / this.speed));
 
-  isCollisionWithBait() {
-    return this.bait.posX === this.posX && this.bait.posY === this.posY;
+      switch (this.direction) {
+        case "right":
+          x = (x + 1) % GRID_SIZE;
+          break;
+        case "left":
+          x = (x - 1 + GRID_SIZE) % GRID_SIZE;
+          break;
+        case "up":
+          y = (y - 1 + GRID_SIZE) % GRID_SIZE;
+          break;
+        case "down":
+          y = (y + 1) % GRID_SIZE;
+          break;
+      }
+
+      if (this.isCollisionWithBait(x, y)) {
+        this.score += 10;
+        this.size++;
+        this.setBait();
+        this.scoreElement.innerHTML = this.score;
+      }
+
+      this.x = x;
+      this.y = y;
+
+      this.move(this.x, this.y);
+    }, 400 / this.speed);
   }
 
   setBait() {
     this.bait.posX = this.getRandomPosition();
     this.bait.posY = this.getRandomPosition();
-    this.bait.element.style.left = this.bait.posX + "px";
-    this.bait.element.style.top = this.bait.posY + "px";
+    let square = document.getElementById(this.bait.posX + "-" + this.bait.posY);
+    square.style.background = "#8734f2";
   }
 
-  setTail() {
-    // const newTail = document.createElement("div");
-    // newTail.className = "tail";
-    // newTail.style.left = this.posX + "px";
-    // newTail.style.top = this.posY + "px";
-    // this.snackElement.appendChild(newTail);
-    // this.tailPositions.push({ left: this.posX, top: this.posY });
-
-    // if (this.tailPositions.length > this.score) {
-    //   const removedTail = this.tailPositions.shift();
-    //   const removedTailElement = this.tailElement.nextElementSibling;
-    //   this.snackElement.removeChild(removedTailElement);
-    // }
-
-    // let tail = document.querySelectorAll(".tail");
-
-    // Array.from(tail).forEach((item, index) => {
-    //   item.style.left = (this.posX + 30 * index) + "px";
-    //   item.style.top = (this.posY + 30 * index) + "px";
-    // });
+  getRandomPosition() {
+    return (Math.floor(Math.random() * GRID_SIZE));
   }
 
-  start() {
-    this.setBait();
-    this.intervalId = setInterval(() => this.move(), this.speed);
-  }
-
-  stop() {
-    clearInterval(this.intervalId);
+  isCollisionWithBait(x, y) {
+    return this.bait.posX === x && this.bait.posY === y;
   }
 }
 
-const snack = new Snack();
-snack.start();
+const snake = new Snake();
 
+// Event listener for arrow key presses to change direction
 window.addEventListener("keydown", function (event) {
   if (event.defaultPrevented) {
     return;
   }
+
   switch (event.key) {
     case "ArrowDown":
-      if (snack.direction !== 'TOP') snack.direction = 'BOTTOM';
+      snake.setDirection("down");
       break;
     case "ArrowUp":
-      if (snack.direction !== 'BOTTOM') snack.direction = 'TOP';
+      snake.setDirection("up");
       break;
     case "ArrowLeft":
-      if (snack.direction !== 'RIGHT') snack.direction = 'LEFT';
+      snake.setDirection("left");
       break;
     case "ArrowRight":
-      if (snack.direction !== 'LEFT') snack.direction = 'RIGHT';
+      snake.setDirection("right");
       break;
     default:
       return;
   }
+
+  event.preventDefault();
 }, true);

@@ -28,39 +28,32 @@ h1,h2{
 .content{
     width: 600px;
     height: 600px;
-    background-color: #05204A;
+    
     margin: 50px;
     position: relative;
 }
 
-.square{
-    background: white;
+.square {
+    background-color: #05204A;
+    border: 1px #05004A solid;
     width: 30px;
     height: 30px;
-    position: absolute;
-    top :0;
-    left: 0;
 }
 
-.Bait{
-    background: red;
+.line{
+    display: flex;
+}
+
+.Bait {
+    background: rgb(195, 0, 255);
+    border-radius: 50%;
     width: 30px;
     height: 30px;
-    border-radius: 50%;
     position: absolute;
-    top:0;
+    top: 0;
     left: 0;
     -webkit-border-radius: 50%;
     -moz-border-radius: 50%;
     -ms-border-radius: 50%;
     -o-border-radius: 50%;
-}
-
-.tail{
-    background: rgb(204, 204, 204);
-    width: 20px;
-    height: 20px;
-    position: absolute;
-    top :0;
-    left: 0;
 }
