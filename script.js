@@ -50,7 +50,6 @@ class Snake {
     this.prevY = this.y;
     this.scoreElement = document.getElementById("score");
     this.bait = {
-      element: document.getElementById("bait"),
       posX: this.getRandomPosition(),
       posY: this.getRandomPosition(),
     };

@@ -44,16 +44,3 @@ h1,h2{
     display: flex;
 }
 
-.Bait {
-    background: rgb(195, 0, 255);
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    -webkit-border-radius: 50%;
-    -moz-border-radius: 50%;
-    -ms-border-radius: 50%;
-    -o-border-radius: 50%;
-}
