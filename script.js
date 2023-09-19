@@ -42,7 +42,7 @@ function shutdownSquare(i, j) {
 class Snake {
   constructor() {
     this.direction = "right";
-    this.speed = 5;
+    this.speed = 3;
     this.size = 2;
     this.x = 4;
     this.y = 9;
@@ -134,16 +134,16 @@ window.addEventListener("keydown", function (event) {
 
   switch (event.key) {
     case "ArrowDown":
-      if (snack.direction !== 'TOP') snack.setDirection("down");
+      if (snack.direction !== 'up') snack.setDirection("down");
       break;
     case "ArrowUp":
-      if (snack.direction !== 'BOTTOM') snack.setDirection("up");
+      if (snack.direction !== 'down') snack.setDirection("up");
       break;
     case "ArrowLeft":
-      if (snack.direction !== 'RIGHT') snack.setDirection("left");
+      if (snack.direction !== 'right') snack.setDirection("left");
       break;
     case "ArrowRight":
-      if (snack.direction !== 'LEFT') snack.setDirection("right");
+      if (snack.direction !== 'left') snack.setDirection("right");
       break;
     default:
       return;
