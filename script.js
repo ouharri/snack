@@ -118,13 +118,15 @@ class Snake {
   }
 
   setBait() {
-    this.bait.posX = this.getRandomPosition();
-    this.bait.posY = this.getRandomPosition();
+    let newX, newY;
 
-    while (this.isCollisionWithTail(this.bait.posX, this.bait.posY)) {
-      this.bait.posX = this.getRandomPosition();
-      this.bait.posY = this.getRandomPosition();
-    }
+    do {
+      newX = this.getRandomPosition();
+      newY = this.getRandomPosition();
+    } while (this.isCollisionWithTail(newX, newY));
+
+    this.bait.posX = newX;
+    this.bait.posY = newY;
 
     document.getElementById(`${this.bait.posX}-${this.bait.posY}`).style.background = "#8734f2"; // Utilisation de l'interpolation de chaîne
   }
