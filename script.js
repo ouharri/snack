@@ -13,10 +13,10 @@ for (let i = 0; i < GRID_SIZE; i++) {
 
   for (let j = 0; j < GRID_SIZE; j++) {
     const square = document.createElement("div");
-    square.id = j + "-" + i;
+    square.id = `${j}-${i}`; // Utilisation de l'interpolation de chaîne pour plus de clarté
     square.classList.add("square");
-    square.style.left = j * CELL_SIZE + "px";
-    square.style.top = i * CELL_SIZE + "px";
+    square.style.left = `${j * CELL_SIZE}px`; // Utilisation de l'interpolation de chaîne
+    square.style.top = `${i * CELL_SIZE}px`; // Utilisation de l'interpolation de chaîne
     line.appendChild(square);
     row.push(square);
   }
@@ -43,12 +43,11 @@ class Snake {
   constructor() {
     this.direction = "right";
     this.speed = 3;
-    this.size = 2;
+    this.size = 1;
     this.x = 4;
     this.y = 9;
-    this.prevX = this.x;
-    this.prevY = this.y;
     this.scoreElement = document.getElementById("score");
+    this.tail = [];
     this.bait = {
       posX: this.getRandomPosition(),
       posY: this.getRandomPosition(),
@@ -56,8 +55,7 @@ class Snake {
     this.score = 0;
 
     // Initialize the bait position
-    let square = document.getElementById(this.bait.posX + "-" + this.bait.posY);
-    square.style.background = "#8734f2";
+    this.setBait();
 
     // Start the game loop
     this.move();
@@ -71,13 +69,20 @@ class Snake {
     setTimeout(() => {
       activateSquare(x, y);
 
-      // Turn off the previous square
-      let prevX = this.x;
-      let prevY = this.y;
+      // Check for collision with tail
+      if (this.isCollisionWithTail(x, y)) {
+        this.gameOver();
+        return;
+      }
 
-      setTimeout(() => {
-        shutdownSquare(prevX, prevY);
-      }, (this.size - 1) * (400 / this.speed));
+      // Store the current position in the tail
+      this.tail.unshift({ x: x, y: y });
+
+      // Turn off the previous square (tail segment)
+      if (this.tail.length > this.size) {
+        const tailSegment = this.tail.pop();
+        shutdownSquare(tailSegment.x, tailSegment.y);
+      }
 
       switch (this.direction) {
         case "right":
@@ -101,9 +106,13 @@ class Snake {
         this.scoreElement.innerHTML = this.score;
       }
 
+      // Update the current and previous positions
+      this.prevX = this.x;
+      this.prevY = this.y;
       this.x = x;
       this.y = y;
 
+      // Continue the game loop
       this.move(this.x, this.y);
     }, 400 / this.speed);
   }
@@ -111,16 +120,36 @@ class Snake {
   setBait() {
     this.bait.posX = this.getRandomPosition();
     this.bait.posY = this.getRandomPosition();
-    let square = document.getElementById(this.bait.posX + "-" + this.bait.posY);
-    square.style.background = "#8734f2";
+
+    while (this.isCollisionWithTail(this.bait.posX, this.bait.posY)) {
+      this.bait.posX = this.getRandomPosition();
+      this.bait.posY = this.getRandomPosition();
+    }
+
+    document.getElementById(`${this.bait.posX}-${this.bait.posY}`).style.background = "#8734f2"; // Utilisation de l'interpolation de chaîne
   }
 
   getRandomPosition() {
-    return (Math.floor(Math.random() * GRID_SIZE));
+    return Math.floor(Math.random() * GRID_SIZE);
   }
 
   isCollisionWithBait(x, y) {
     return this.bait.posX === x && this.bait.posY === y;
+  }
+
+  isCollisionWithTail(x, y) {
+    for (let i = 0; i < this.tail.length; i++) {
+      const segment = this.tail[i];
+      if (segment.x === x && segment.y === y) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  gameOver() {
+    alert("Game Over! You lost.");
+    // Perform any additional actions needed when the game is over
   }
 }
 
